@@ -1,10 +1,11 @@
 import express from 'express';
 
-import { getAllPosts, findById } from '../controllers/postsController.js';
+import { getAllPosts, findById, postsCreate } from '../controllers/postsController.js';
 
 const routes = express.Router();
 
-routes.get('/posts', getAllPosts);
-routes.get('/posts/:id', findById);
+routes.post('/posts/create', postsCreate)
+routes.get('/posts/getAll', getAllPosts);
+routes.get('/posts/findBy/:id', findById);
 
 export default routes;
