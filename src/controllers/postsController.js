@@ -1,14 +1,12 @@
+import fs from 'fs';
+
 import { listAllPosts, findByIdPost, createPosts, deleteByIdPost, updatePostInDb } from "../modules/postsModules.js";
 
 export async function postsCreate(req, res) {
-  const { description, imageUrl, alt } = req.body;
-
-  if (!description || !imageUrl || !alt) {
-    return res.status(400).json({ error: 'Missing required fields' });
-  }
+  const newPosts = req.body;
 
   try {
-    const post = await createPosts(description, imageUrl, alt);
+    const post = await createPosts(newPosts);
 
     res.status(201).json(post);
   } catch (error) {
@@ -57,4 +55,25 @@ export async function updatePost(req, res) {
   } catch (error) {
     return res.status(500).json({ error: 'Failed to upadte post', details: error.message })
   };
+}
+
+export async function uploadImage(req, res) {
+  const newPosts = {
+    description: "",
+    imageUrl: req.file.originalname,
+    alt: ""
+  };
+
+  try {
+    const post = await createPosts(newPosts);
+
+    const postId = post.data._id;
+
+    const image = `uploads/${postId}.png`;
+    fs.renameSync(req.file.path, image);
+
+    res.status(201).json(post);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create post', details: error.message });
+  }
 }
