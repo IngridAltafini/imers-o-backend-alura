@@ -26,7 +26,6 @@ export async function createPosts(description, imageUrl, alt) {
   };
 }
 
-
 export async function listAllPosts() {
   const db = connection.db("imersao-backend-alura")
   const collection = db.collection("posts")
@@ -39,4 +38,36 @@ export async function findByIdPost(id) {
   const collection = db.collection("posts")
 
   return collection.findOne({ _id: new ObjectId(id) })
+}
+
+export async function deleteByIdPost(id) {
+  const db = connection.db("imersao-backend-alura")
+  const collection = db.collection("posts")
+
+  return collection.deleteOne({ _id: new ObjectId(id) })
+}
+
+export async function updatePostInDb(id, updateData) {
+  const db = connection.db("imersao-backend-alura");
+  const collection = db.collection("posts");
+
+  if (!ObjectId.isValid(id)) {
+    throw new Error('Invalid ID format');
+  }
+
+  const result = await collection.updateOne(
+    { _id: new ObjectId(id) },
+    { $set: updateData }
+  );
+
+  if (result.matchedCount === 0) {
+    throw new Error('Post not found');
+  }
+
+  return {
+    data: {
+      _id: id,
+      ...updateData,
+    },
+  };
 }
