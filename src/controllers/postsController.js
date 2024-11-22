@@ -1,6 +1,7 @@
 import fs from 'fs';
 
 import { listAllPosts, findByIdPost, createPosts, deleteByIdPost, updatePostInDb } from "../modules/postsModules.js";
+import generateDescriptionWithGemini from "../services/geminiService.js"
 
 export async function postsCreate(req, res) {
   const newPosts = req.body;
@@ -42,13 +43,18 @@ export async function deletePost(req, res) {
 
 export async function updatePost(req, res) {
   const { id } = req.params;
-  const updateData = req.body;
-
-  if (!id || !updateData || typeof updateData !== 'object') {
-    return res.status(400).json({ error: 'Missing or invalid fields' });
-  }
+  const urlImage = `http://localhost:3333/${id}.png`
 
   try {
+    const imageBuffer = fs.readFileSync(`uploads/${id}.png`)
+    const description = await generateDescriptionWithGemini(imageBuffer)
+
+    const updateData = {
+      description: description,
+      imageUrl: urlImage,
+      alt: req.body.alt
+    };
+
     const result = await updatePostInDb(id, updateData);
 
     return res.status(200).json(result);

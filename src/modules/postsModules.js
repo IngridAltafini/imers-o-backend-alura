@@ -1,3 +1,5 @@
+import 'dotenv/config'
+
 import connectionMongo from '../config/dbConfig.js';
 const connection = await connectionMongo(process.env.STRING_CONNECTION)
 import { ObjectId } from 'mongodb';
